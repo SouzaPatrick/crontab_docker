@@ -1,0 +1,35 @@
+version: '3.7'
+
+services:
+  cron:
+    container_name: cron
+    build:
+      context: ./crontab
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - rabbit
+      - nameko
+    networks:
+      - scripts-ethoson
+  rabbit:
+    image: rabbitmq:3
+    container_name: rabbit
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+    networks:
+      - scripts-ethoson
+  nameko:
+    build:
+      context: ./update
+      dockerfile: Dockerfile
+    container_name: nameko
+    restart: unless-stopped
+    depends_on:
+      - rabbit
+    networks:
+      - scripts-ethoson
+networks:
+  scripts-ethoson:
+    driver: bridge
